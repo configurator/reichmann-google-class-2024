@@ -9,6 +9,12 @@ services:
     ports:
       - '4000:4000'
 
+    depends_on:
+      db:
+        condition: service_healthy
+      create-table:
+        condition: service_completed_successfully
+
   db:
     image: postgres
     environment:
@@ -17,9 +23,20 @@ services:
     volumes:
       - ./database-data:/var/lib/postgresql/data
 
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready', '-d', 'blog_db']
+      interval: 1s
+      timeout: 60s
+      retries: 5
+      start_period: 1s
+
   create-table:
     image: postgres
     command: bash -c 'chmod 600 /root/.pgpass && psql -h db -U postgres -f /scripts/rebuild.sql'
+
+    depends_on:
+      db:
+        condition: service_healthy
 
     volumes:
       - ./sql/rebuild.sql:/scripts/rebuild.sql
