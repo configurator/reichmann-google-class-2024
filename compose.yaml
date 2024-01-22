@@ -1,0 +1,27 @@
+services:
+  create-react-app:
+    build: create-react-app
+    ports:
+      - '3000:80'
+
+  express:
+    build: express
+    ports:
+      - '4000:4000'
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: password
+
+    volumes:
+      - ./database-data:/var/lib/postgresql/data
+
+  create-table:
+    image: postgres
+    command: bash -c 'chmod 600 /root/.pgpass && psql -h db -U postgres -f /scripts/rebuild.sql'
+
+    volumes:
+      - ./sql/rebuild.sql:/scripts/rebuild.sql
+      - ./sql/.pgpass:/root/.pgpass
+# docker compose up --build

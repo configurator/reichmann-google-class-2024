@@ -1,0 +1,7 @@
+**/node_modules
+**/out
+
+# npm i -D typescript
+
+# docker build . -t tag
+# docker run -it --rm -p 3000:3000 tag
